@@ -1,14 +1,19 @@
-package main
+package game
 
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	"log"
 	"time"
 )
 
-const bgTexture = "resources/images/background.jpeg"
+const (
+	bgTexture = "resources/images/background.jpeg"
+	font      = "resources/fonts/coolvetica.otf"
+	fontSize  = 20
+)
 
 type scene struct {
 	bg    *sdl.Texture
@@ -17,7 +22,7 @@ type scene struct {
 	timer *timer
 }
 
-func newScene(r *sdl.Renderer) (*scene, error) {
+func NewScene(r *sdl.Renderer) (*scene, error) {
 	bg, err := img.LoadTexture(r, bgTexture)
 	if err != nil {
 		return nil, fmt.Errorf("could not load backgound: %v", err)
@@ -38,7 +43,7 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 	return &scene{bg: bg, bird: b, pipes: ps, timer: t}, nil
 }
 
-func (s *scene) run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
+func (s *scene) Run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 	errc := make(chan error)
 
 	go func() {
@@ -53,7 +58,7 @@ func (s *scene) run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 			case <-tick:
 				s.update()
 				if s.bird.isDead() {
-					drawTitle(r, fmt.Sprintf("SCORE %d", s.timer.seconds()))
+					s.drawTitle(r, fmt.Sprintf("SCORE %d", s.timer.seconds()))
 					time.Sleep(2 * time.Second)
 					s.restart()
 				}
@@ -77,6 +82,37 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 		log.Printf("Unknown event %T", event)
 	}
 	return false
+}
+
+func (s *scene) drawTitle(r *sdl.Renderer, text string) error {
+	r.Clear()
+
+	f, err := ttf.OpenFont(font, fontSize)
+	if err != nil {
+		return fmt.Errorf("could not load font: %v", err)
+	}
+	defer f.Close()
+
+	surface, err := f.RenderUTF8Solid(text, sdl.Color{R: 255, G: 100, B: 0, A: 255})
+	if err != nil {
+		return fmt.Errorf("could not render title: %v", err)
+	}
+	defer surface.Free()
+
+	t, err := r.CreateTextureFromSurface(surface)
+	if err != nil {
+		return fmt.Errorf("could not create texture: %v", err)
+	}
+	defer t.Destroy()
+
+	rect := &sdl.Rect{X: 200, Y: 250, W: 400, H: 100}
+	if err := r.Copy(t, nil, rect); err != nil {
+		return fmt.Errorf("could not copy texture: %v", err)
+	}
+
+	r.Present()
+
+	return nil
 }
 
 func (s *scene) update() {
@@ -110,7 +146,7 @@ func (s *scene) paint(r *sdl.Renderer) error {
 	return nil
 }
 
-func (s *scene) destroy() {
+func (s *scene) Destroy() {
 	s.bg.Destroy()
 	s.bird.destroy()
 	s.pipes.destroy()

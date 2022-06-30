@@ -14,9 +14,9 @@ Install dependencies
 ```sh
 $ go mod vendor
 ```
-Build & Run
+Run
 ```sh
-$ go build && ./flappy-gopher
+$ go run cmd/main.go
 ```
 
 ### Tutorial ###
