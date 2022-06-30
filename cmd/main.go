@@ -9,6 +9,11 @@ import (
 	"runtime"
 )
 
+const (
+	title         = "Flappy Gopher"
+	width, height = 800, 600
+)
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)
@@ -27,10 +32,11 @@ func run() error {
 	}
 	defer ttf.Quit()
 
-	w, r, err := sdl.CreateWindowAndRenderer(800, 600, sdl.WINDOW_SHOWN)
+	w, r, err := sdl.CreateWindowAndRenderer(width, height, sdl.WINDOW_SHOWN)
 	if err != nil {
 		return fmt.Errorf("could not create window: %v", err)
 	}
+	w.SetTitle(title)
 	defer w.Destroy()
 
 	s, err := game.NewScene(r)

@@ -11,7 +11,6 @@ import (
 type timer struct {
 	mu   sync.RWMutex
 	time int
-	font *ttf.Font
 }
 
 func newTimer() *timer {
