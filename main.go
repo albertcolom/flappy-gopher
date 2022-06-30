@@ -8,6 +8,11 @@ import (
 	"runtime"
 )
 
+const (
+	font     = "resources/fonts/coolvetica.otf"
+	fontSize = 20
+)
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)
@@ -58,7 +63,7 @@ func run() error {
 func drawTitle(r *sdl.Renderer, text string) error {
 	r.Clear()
 
-	f, err := ttf.OpenFont("resources/fonts/coolvetica.otf", 20)
+	f, err := ttf.OpenFont(font, fontSize)
 	if err != nil {
 		return fmt.Errorf("could not load font: %v", err)
 	}
@@ -76,7 +81,8 @@ func drawTitle(r *sdl.Renderer, text string) error {
 	}
 	defer t.Destroy()
 
-	if err := r.Copy(t, nil, nil); err != nil {
+	rect := &sdl.Rect{X: 200, Y: 250, W: 400, H: 100}
+	if err := r.Copy(t, nil, rect); err != nil {
 		return fmt.Errorf("could not copy texture: %v", err)
 	}
 

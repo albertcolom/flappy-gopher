@@ -14,6 +14,7 @@ type scene struct {
 	bg    *sdl.Texture
 	bird  *bird
 	pipes *pipes
+	timer *timer
 }
 
 func newScene(r *sdl.Renderer) (*scene, error) {
@@ -32,7 +33,9 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 		return nil, err
 	}
 
-	return &scene{bg: bg, bird: b, pipes: ps}, nil
+	t := newTimer()
+
+	return &scene{bg: bg, bird: b, pipes: ps, timer: t}, nil
 }
 
 func (s *scene) run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
@@ -50,8 +53,8 @@ func (s *scene) run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 			case <-tick:
 				s.update()
 				if s.bird.isDead() {
-					drawTitle(r, "GAME OVER")
-					time.Sleep(4 * time.Second)
+					drawTitle(r, fmt.Sprintf("SCORE %d", s.timer.seconds()))
+					time.Sleep(2 * time.Second)
 					s.restart()
 				}
 				if err := s.paint(r); err != nil {
@@ -79,12 +82,14 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 func (s *scene) update() {
 	s.bird.update()
 	s.pipes.update()
+	s.timer.update()
 	s.pipes.touch(s.bird)
 }
 
 func (s *scene) restart() {
 	s.bird.restart()
 	s.pipes.restart()
+	s.timer.restart()
 }
 
 func (s *scene) paint(r *sdl.Renderer) error {
@@ -96,6 +101,9 @@ func (s *scene) paint(r *sdl.Renderer) error {
 		return err
 	}
 	if err := s.pipes.paint(r); err != nil {
+		return err
+	}
+	if err := s.timer.paint(r); err != nil {
 		return err
 	}
 	r.Present()
