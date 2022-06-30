@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	gravity   = 0.1
+	gravity   = 0.25
 	jumpSpeed = 5
 )
 
@@ -93,9 +93,6 @@ func (b *bird) touch(p *pipe) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-
 	if p.x > b.x+b.w {
 		return
 	}
@@ -103,7 +100,11 @@ func (b *bird) touch(p *pipe) {
 		return
 	}
 
-	if p.h < b.y-b.h/2 {
+	if !p.inverted && p.h < b.y-b.h/2 {
+		return
+	}
+
+	if p.inverted && 600-p.h > b.y-b.h/2 {
 		return
 	}
 

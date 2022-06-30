@@ -8,14 +8,16 @@ import (
 	"time"
 )
 
+const bgTexture = "resources/images/pipe.png"
+
 type scene struct {
-	bg   *sdl.Texture
-	bird *bird
-	pipe *pipe
+	bg    *sdl.Texture
+	bird  *bird
+	pipes *pipes
 }
 
 func newScene(r *sdl.Renderer) (*scene, error) {
-	bg, err := img.LoadTexture(r, "resources/images/background.jpeg")
+	bg, err := img.LoadTexture(r, bgTexture)
 	if err != nil {
 		return nil, fmt.Errorf("could not load backgound: %v", err)
 	}
@@ -25,12 +27,12 @@ func newScene(r *sdl.Renderer) (*scene, error) {
 		return nil, err
 	}
 
-	p, err := newPipe(r)
+	ps, err := newPipes(r)
 	if err != nil {
 		return nil, err
 	}
 
-	return &scene{bg: bg, bird: b, pipe: p}, nil
+	return &scene{bg: bg, bird: b, pipes: ps}, nil
 }
 
 func (s *scene) run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
@@ -76,13 +78,13 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 
 func (s *scene) update() {
 	s.bird.update()
-	s.pipe.update()
-	s.bird.touch(s.pipe)
+	s.pipes.update()
+	s.pipes.touch(s.bird)
 }
 
 func (s *scene) restart() {
 	s.bird.restart()
-	s.pipe.restart()
+	s.pipes.restart()
 }
 
 func (s *scene) paint(r *sdl.Renderer) error {
@@ -93,7 +95,7 @@ func (s *scene) paint(r *sdl.Renderer) error {
 	if err := s.bird.paint(r); err != nil {
 		return err
 	}
-	if err := s.pipe.paint(r); err != nil {
+	if err := s.pipes.paint(r); err != nil {
 		return err
 	}
 	r.Present()
@@ -103,5 +105,5 @@ func (s *scene) paint(r *sdl.Renderer) error {
 func (s *scene) destroy() {
 	s.bg.Destroy()
 	s.bird.destroy()
-	s.pipe.destroy()
+	s.pipes.destroy()
 }
