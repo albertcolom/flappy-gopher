@@ -44,6 +44,7 @@ func (s *scene) run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 				if s.bird.isDead() {
 					drawTitle(r, "GAME OVER")
 					time.Sleep(4 * time.Second)
+					s.restart()
 				}
 				if err := s.paint(r); err != nil {
 					errc <- err
@@ -69,6 +70,10 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 
 func (s *scene) update() {
 	s.bird.update()
+}
+
+func (s *scene) restart() {
+	s.bird.restart()
 }
 
 func (s *scene) paint(r *sdl.Renderer) error {

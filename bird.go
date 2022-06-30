@@ -45,6 +45,15 @@ func (b *bird) update() {
 	b.speed += gravity
 }
 
+func (b *bird) restart() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	b.y = 300
+	b.speed = 0
+	b.dead = false
+}
+
 func (b *bird) paint(r *sdl.Renderer) error {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
