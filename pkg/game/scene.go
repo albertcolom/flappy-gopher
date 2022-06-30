@@ -16,10 +16,11 @@ const (
 )
 
 type scene struct {
-	bg    *sdl.Texture
-	bird  *bird
-	pipes *pipes
-	timer *timer
+	bg      *sdl.Texture
+	bird    *bird
+	pipes   *pipes
+	timer   *timer
+	started bool
 }
 
 func NewScene(r *sdl.Renderer) (*scene, error) {
@@ -56,12 +57,15 @@ func (s *scene) Run(events <-chan sdl.Event, r *sdl.Renderer) <-chan error {
 					return
 				}
 			case <-tick:
-				s.update()
+				if !s.hasStarted() {
+					s.drawTitle(r, "PRESS TO START")
+					continue
+				}
 				if s.bird.isDead() {
 					s.drawTitle(r, fmt.Sprintf("SCORE %d", s.timer.seconds()))
-					time.Sleep(2 * time.Second)
-					s.restart()
+					continue
 				}
+				s.update()
 				if err := s.paint(r); err != nil {
 					errc <- err
 				}
@@ -76,6 +80,9 @@ func (s *scene) handleEvent(event sdl.Event) bool {
 	case *sdl.QuitEvent:
 		return true
 	case *sdl.MouseButtonEvent, *sdl.KeyboardEvent:
+		if s.bird.isDead() || !s.hasStarted() {
+			s.restart()
+		}
 		s.bird.jump()
 	case *sdl.MouseMotionEvent, *sdl.WindowEvent, *sdl.AudioDeviceEvent, *sdl.TextInputEvent:
 	default:
@@ -115,6 +122,10 @@ func (s *scene) drawTitle(r *sdl.Renderer, text string) error {
 	return nil
 }
 
+func (s *scene) hasStarted() bool {
+	return s.started
+}
+
 func (s *scene) update() {
 	s.bird.update()
 	s.pipes.update()
@@ -123,6 +134,7 @@ func (s *scene) update() {
 }
 
 func (s *scene) restart() {
+	s.started = true
 	s.bird.restart()
 	s.pipes.restart()
 	s.timer.restart()
