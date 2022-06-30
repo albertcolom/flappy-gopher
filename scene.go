@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const bgTexture = "resources/images/pipe.png"
+const bgTexture = "resources/images/background.jpeg"
 
 type scene struct {
 	bg    *sdl.Texture
