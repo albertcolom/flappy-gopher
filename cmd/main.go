@@ -1,12 +1,13 @@
 package main
 
 import (
-	"flappy-gopher/pkg/game"
 	"fmt"
-	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/ttf"
 	"os"
 	"runtime"
+
+	"flappy-gopher/pkg/game"
+	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 )
 
 const (

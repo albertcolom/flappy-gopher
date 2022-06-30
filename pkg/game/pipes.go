@@ -2,11 +2,12 @@ package game
 
 import (
 	"fmt"
-	"github.com/veandco/go-sdl2/img"
-	"github.com/veandco/go-sdl2/sdl"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/veandco/go-sdl2/img"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 const pipeTexture = "resources/images/pipe.png"

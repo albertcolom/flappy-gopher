@@ -2,9 +2,10 @@ package game
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
-	"sync"
 )
 
 const (
